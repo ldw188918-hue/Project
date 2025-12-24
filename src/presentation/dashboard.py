@@ -129,6 +129,24 @@ if st.session_state['theme'] == 'Dark Mode':
             background-color: #0E1117 !important;
         }
 
+        /* [미세 조정] 사이드바 구분선 (HR) 가시성 확보 */
+        [data-testid="stSidebar"] hr {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            margin: 20px 0;
+        }
+        
+        /* [미세 조정] 사이드바 입력 위젯 (슬라이더, 업로더) 경계 명확화 */
+        [data-testid="stSidebar"] [data-baseweb="file-uploader"] {
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        /* 슬라이더 트랙 강조 */
+        [data-testid="stSidebar"] [data-baseweb="slider"] div {
+            
+        }
+
         /* 테마별 Metric Label 색상 교정 */
         .stMetric label {
             color: #E0E0E0 !important;
