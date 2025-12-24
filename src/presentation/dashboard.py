@@ -97,7 +97,8 @@ with st.sidebar.expander("📁 데이터 업로드", expanded=False):
         )
 
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)
-@st.cache_data
+# 데이터 로드 (DI: Dependency Injection 유사 패턴)
+# @st.cache_data 제거: 파일 업로드 스트림 이슈 방지 및 즉각적인 반응성 확보
 def get_simulation_service(_parts_file=None, _suppliers_file=None, _production_file=None):
     repo = SimulationRepository()
     
@@ -112,6 +113,17 @@ def get_simulation_service(_parts_file=None, _suppliers_file=None, _production_f
         context = repo.load_context()
     
     return SimulationService(context)
+
+
+
+# 파일 업로드 성공 피드백
+if parts_file or suppliers_file or production_file:
+    uploaded_files = []
+    if parts_file: uploaded_files.append("부품")
+    if suppliers_file: uploaded_files.append("공급사")
+    if production_file: uploaded_files.append("생산라인")
+    
+    st.sidebar.success(f"✅ 데이터 로드 완료: {', '.join(uploaded_files)}")
 
 service = get_simulation_service(parts_file, suppliers_file, production_file)
 

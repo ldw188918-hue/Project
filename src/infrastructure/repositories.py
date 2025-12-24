@@ -69,12 +69,20 @@ class SimulationRepository:
         raw_data = _generate_mock_data()
         
         # 업로드된 파일이 있으면 덮어쓰기
-        if parts_csv is not None:
-            raw_data['parts'] = pd.read_csv(parts_csv)
-        if suppliers_csv is not None:
-            raw_data['suppliers'] = pd.read_csv(suppliers_csv)
-        if production_csv is not None:
-            raw_data['production'] = pd.read_csv(production_csv)
+        try:
+            if parts_csv is not None:
+                parts_csv.seek(0)
+                raw_data['parts'] = pd.read_csv(parts_csv)
+            if suppliers_csv is not None:
+                suppliers_csv.seek(0)
+                raw_data['suppliers'] = pd.read_csv(suppliers_csv)
+            if production_csv is not None:
+                production_csv.seek(0)
+                raw_data['production'] = pd.read_csv(production_csv)
+        except Exception as e:
+            # 에러 발생 시 로그를 남기거나 처리할 수 있음 (여기선 간단히 pass 또는 re-raise)
+            # print(f"Error reading CSV: {e}")
+            raise e
         
         return self._build_context(raw_data)
     
