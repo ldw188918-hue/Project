@@ -4,7 +4,10 @@ import plotly.express as px
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# src 디렉토리를 Python 경로에 추가
+src_path = Path(__file__).parent.parent
+sys.path.insert(0, str(src_path))
 
 from infrastructure.repositories import SimulationRepository
 from application.services import SimulationService
