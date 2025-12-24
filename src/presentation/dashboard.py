@@ -35,6 +35,10 @@ def load_templates():
 
 templates = load_templates()
 
+# 세션 상태 초기화
+if 'use_sample' not in st.session_state:
+    st.session_state['use_sample'] = False
+
 # 사이드바 - CSV 업로드
 with st.sidebar.expander("📁 데이터 업로드", expanded=False):
     st.caption("자체 데이터로 시뮬레이션")
@@ -96,23 +100,42 @@ with st.sidebar.expander("📁 데이터 업로드", expanded=False):
             help="생산라인 정보 CSV 파일을 업로드하세요"
         )
 
+# 파일이 업로드되면 샘플 모드 해제
+if parts_file or suppliers_file or production_file:
+    st.session_state['use_sample'] = False
+
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)
 # @st.cache_data 제거: 파일 업로드 스트림 이슈 방지 및 즉각적인 반응성 확보
 def get_simulation_service(_parts_file=None, _suppliers_file=None, _production_file=None):
     repo = SimulationRepository()
     
-    # 업로드된 파일이 있으면 사용, 없으면 mock 데이터
-    if _parts_file or _suppliers_file or _production_file:
-        context = repo.load_context_from_uploads(
-            parts_csv=_parts_file,
-            suppliers_csv=_suppliers_file,
-            production_csv=_production_file
-        )
-    else:
-        context = repo.load_context()
-    
-    return SimulationService(context)
+    try:
+        # 1. 업로드된 파일이 하나라도 있으면 업로드 로드 시도
+        if _parts_file or _suppliers_file or _production_file:
+            context = repo.load_context_from_uploads(
+                parts_csv=_parts_file,
+                suppliers_csv=_suppliers_file,
+                production_csv=_production_file
+            )
+            return SimulationService(context)
+            
+        # 2. 샘플 데이터 사용 모드이면 Mock 데이터 로드
+        elif st.session_state.get('use_sample', False):
+            context = repo.load_context()
+            return SimulationService(context)
+            
+        # 3. 그 외의 경우 (데이터 없음)
+        else:
+            return None
+            
+    except Exception as e:
+        st.error(f"❌ 데이터 처리 중 오류가 발생했습니다: {e}")
+        # 디버깅 도움말
+        with st.expander("🛠️ 상세 오류 정보"):
+            st.code(str(e))
+            st.info("파일 형식이 올바른지 확인해주세요 (UTF-8 인코딩, 필수 컬럼 포함 등).")
+        return None
 
 
 
@@ -126,6 +149,28 @@ if parts_file or suppliers_file or production_file:
     st.sidebar.success(f"✅ 데이터 로드 완료: {', '.join(uploaded_files)}")
 
 service = get_simulation_service(parts_file, suppliers_file, production_file)
+
+# --- Empty State 처리 ---
+if service is None:
+    st.info("👈 왼쪽 사이드바에서 CSV 파일을 업로드하여 분석을 시작하세요.")
+    
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown("""
+        ### 사용 방법
+        1. **데이터 업로드**: 사이드바에서 부품, 공급사, 생산라인 데이터를 업로드하세요.
+        2. **시뮬레이션**: 가격 변화와 공급 지연 시나리오를 조절하세요.
+        3. **인사이트 확인**: AI가 분석한 리스크와 대응 방안을 확인하세요.
+        """)
+        
+        if st.button("🚀 샘플 데이터로 체험하기", type="primary", use_container_width=True):
+            st.session_state['use_sample'] = True
+            st.rerun()
+
+    # 데이터가 없으면 여기서 실행 중단 (아래 대시보드 코드 실행 안 됨)
+    st.stop()
+
+# --- 데이터가 있을 때만 아래 로직 실행 ---
 
 # 하지만 순수하게 하기 위해 서비스나 리포지토리에서 DF 변환 메서드를 제공하는 것이 좋음.
 context = service.context
