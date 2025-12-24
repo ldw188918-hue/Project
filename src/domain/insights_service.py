@@ -40,8 +40,8 @@ class InsightsService:
         # 4. 공급사 리스크 분석
         insights.extend(self._analyze_supplier_risk(context, delay_days))
         
-        # 5. 복합 리스크 분석
-        if price_increase_pct > 0 and delay_days > 0:
+        # 5. 복합 리스크 분석 (가격 변화와 지연이 동시에 있을 때)
+        if abs(price_increase_pct) >= 15 and delay_days >= 10:
             insights.extend(self._analyze_combined_risk(result, price_increase_pct, delay_days))
         
         # 우선순위 순으로 정렬
@@ -53,7 +53,51 @@ class InsightsService:
         """영업이익 영향 분석"""
         insights = []
         
-        if profit_delta < -100000:
+        # 가격 하락 시나리오 (profit_delta > 0, 긍정적)
+        if profit_delta > 100000:
+            insights.append(Insight(
+                type="info",
+                title="✅ 대폭 영업이익 증가 예상",
+                message=f"원자재 가격 {abs(price_increase_pct)}% 하락으로 약 ${profit_delta:,.0f}의 "
+                        f"이익이 예상됩니다. 경쟁력 강화의 기회입니다!",
+                priority=1
+            ))
+            insights.append(Insight(
+                type="recommendation",
+                title="💡 기회 활용 방안",
+                message="1) 시장 점유율 확대 공격적 마케팅\n"
+                        "2) 제품 가격 경쟁력으로 판매 확대\n"
+                        "3) 장기 계약으로 낮은 가격 유지\n"
+                        "4) 여유 자금으로 연구개발 투자",
+                priority=2
+            ))
+        elif profit_delta > 50000:
+            insights.append(Insight(
+                type="info",
+                title="✅ 영업이익 증가 예상",
+                message=f"원자재 가격 하락으로 ${profit_delta:,.0f}의 이익이 예상됩니다. "
+                        f"비용 절감 효과를 활용하세요.",
+                priority=2
+            ))
+            insights.append(Insight(
+                type="recommendation",
+                title="💡 활용 전략",
+                message="1) 재고 확대로 추가 비용 절감\n"
+                        "2) 제품 가격 조정 검토\n"
+                        "3) 마진 개선 기회 활용",
+                priority=3
+            ))
+        elif profit_delta > 10000:
+            insights.append(Insight(
+                type="info",
+                title="📊 소폭 영업이익 증가",
+                message=f"${profit_delta:,.0f}의 이익이 예상됩니다. "
+                        f"긍정적인 변화를 모니터링하세요.",
+                priority=3
+            ))
+        
+        # 가격 상승 시나리오 (profit_delta < 0, 부정적)
+        elif profit_delta < -100000:
             insights.append(Insight(
                 type="warning",
                 title="⚠️ 심각한 영업이익 감소 예상",
@@ -194,6 +238,23 @@ class InsightsService:
                         "3) 고객사 가격 인상 협상\n"
                         "4) 긴급 자금 흐름 점검",
                 priority=1
+            ))
+        # 가격 하락 + 지연의 복합 효과 (기회와 위험 혼재)
+        elif price_increase_pct <= -15 and delay_days >= 10:
+            insights.append(Insight(
+                type="info",
+                title="⚖️ 복합 상황 발생",
+                message=f"원자재 가격 하락({abs(price_increase_pct)}%)으로 비용이 절감되지만, "
+                        f"공급 지연({delay_days}일)으로 생산 차질이 예상됩니다. 균형잡힌 대응이 필요합니다.",
+                priority=2
+            ))
+            insights.append(Insight(
+                type="recommendation",
+                title="💡 균형 대응 전략",
+                message="1) 비용 절감 이익을 재고 확보에 투자\n"
+                        "2) 공급 지연 해결에 우선순위 부여\n"
+                        "3) 장기적 관점에서 공급망 안정화",
+                priority=2
             ))
         
         return insights

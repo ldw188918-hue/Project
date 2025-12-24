@@ -127,11 +127,12 @@ st.sidebar.header("🎛️ What-If 시나리오 시뮬레이션")
 st.sidebar.markdown("변수를 조절하여 공급망 예상 리스크를 시뮬레이션하세요.")
 
 price_increase = st.sidebar.slider(
-    "원자재 단가 상승률 (%)",
-    min_value=0.0,
+    "원자재 단가 변화율 (%)",
+    min_value=-50.0,
     max_value=50.0,
     value=0.0,
-    step=1.0
+    step=1.0,
+    help="양수: 가격 상승, 음수: 가격 하락"
 )
 
 supplier_delay = st.sidebar.slider(

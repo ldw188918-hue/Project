@@ -46,11 +46,11 @@ class ForecastService:
         context: SimulationContext,
         max_increase: float
     ) -> pd.DataFrame:
-        """가격 상승률별 영업이익 영향 예측"""
+        """가격 변화율별 영업이익 영향 예측 (상승 및 하락)"""
         scenarios = []
         
-        # 0%부터 max_increase%까지 5% 간격으로
-        for pct in range(0, int(max_increase) + 1, 5):
+        # -max_increase%부터 max_increase%까지 5% 간격으로
+        for pct in range(int(-max_increase), int(max_increase) + 1, 5):
             if pct == 0:
                 profit_delta = 0
             else:
@@ -98,13 +98,16 @@ class ForecastService:
         """복합 시나리오 예측 (주요 조합만)"""
         combined = []
         
-        # 주요 시나리오 조합
+        # 주요 시나리오 조합 (가격 상승/하락 포함)
         scenarios = [
             (0, 0, "정상 상태"),
+            (-20, 0, "가격 대폭 하락"),
+            (-10, 5, "가격 하락 + 경미한 지연"),
             (10, 5, "경미한 리스크"),
             (15, 10, "중간 리스크"),
             (20, 15, "높은 리스크"),
-            (30, 20, "매우 높은 리스크")
+            (30, 20, "매우 높은 리스크"),
+            (-20, 15, "가격 하락 + 높은 지연")
         ]
         
         for price_pct, delay_days, label in scenarios:
