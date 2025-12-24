@@ -39,67 +39,142 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS for Premium UI ---
-st.markdown("""
-<style>
-    /* 메인 타이틀 그라데이션 */
-    .block-container h1 {
-        background: linear-gradient(90deg, #00E5FF, #FF2B7D);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-        letter-spacing: -1px;
-    }
-    
-    /* 카드 스타일 (Glassmorphism) */
-    .stMetric {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 15px;
-        backdrop-filter: blur(10px);
-        transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    
-    .stMetric:hover {
-        transform: translateY(-2px);
-        border-color: #00E5FF;
-        box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
-    }
-    
-    /* Expander 스타일 */
-    .streamlit-expanderHeader {
-        background-color: #1A1D24 !important;
-        border-radius: 8px !important;
-        border: 1px solid transparent;
-        transition: all 0.2s;
-    }
-    
-    .streamlit-expanderHeader:hover {
-        border-color: #FF2B7D;
-        color: #FF2B7D !important;
-    }
-    
-    /* 탭 스타일 */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-    }
+# --- 세션 상태 초기화 (테마) ---
+if 'theme' not in st.session_state:
+    st.session_state['theme'] = 'Dark Mode'
 
-    .stTabs [data-baseweb="tab"] {
-        background-color: #1A1D24;
-        border-radius: 4px;
-        border: 1px solid rgba(255,255,255,0.1);
-        padding: 10px 20px;
-    }
-
-    .stTabs [aria-selected="true"] {
-        background-color: #00E5FF !important;
-        color: black !important;
-        font-weight: bold;
-    }
+# --- 사이드바 테마 설정 ---
+with st.sidebar:
+    st.markdown("---")
+    st.markdown("### 🎨 테마 설정")
+    selected_theme = st.radio(
+        "디자인 모드 선택",
+        ["Dark Mode", "Light Mode"],
+        index=0 if st.session_state['theme'] == 'Dark Mode' else 1,
+        key='theme_radio'
+    )
     
-</style>
-""", unsafe_allow_html=True)
+    # 상태 업데이트 및 리런 (즉시 반영을 위함)
+    if selected_theme != st.session_state['theme']:
+        st.session_state['theme'] = selected_theme
+        st.rerun()
+
+# --- Dynamic CSS Injection ---
+if st.session_state['theme'] == 'Dark Mode':
+    # [Premium Dark / Neon Theme]
+    primary_color = "#00E5FF"
+    bg_color = "#0E1117"
+    text_color = "#FFFFFF"
+    card_bg = "rgba(255, 255, 255, 0.05)"
+    chart_template = "plotly_dark"
+    
+    st.markdown("""
+    <style>
+        /* 메인 타이틀 그라데이션 */
+        .block-container h1 {
+            background: linear-gradient(90deg, #00E5FF, #FF2B7D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        /* 카드 스타일 (Glassmorphism) */
+        .stMetric {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        
+        .stMetric:hover {
+            transform: translateY(-2px);
+            border-color: #00E5FF;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+        }
+        
+        /* Expander 스타일 */
+        .streamlit-expanderHeader {
+            background-color: #1A1D24 !important;
+            border-radius: 8px !important;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            border-color: #FF2B7D;
+            color: #FF2B7D !important;
+        }
+        
+        /* 탭 스타일 */
+        .stTabs [data-baseweb="tab-list"] { gap: 10px; }
+        .stTabs [data-baseweb="tab"] {
+            background-color: #1A1D24;
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #00E5FF !important; color: black !important; font-weight: bold;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+else:
+    # [Clean Light / Modern Theme]
+    primary_color = "#1f77b4" # Classic Blue
+    bg_color = "#ffffff"
+    text_color = "#262730"
+    card_bg = "#f0f2f6"
+    chart_template = "plotly_white"
+    
+    st.markdown("""
+    <style>
+        /* 메인 타이틀 (깔끔한 블루) */
+        .block-container h1 {
+            color: #1f77b4;
+            font-weight: 700;
+        }
+        
+        /* 카드 스타일 (Soft Shadow) */
+        .stMetric {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .stMetric:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #1f77b4;
+        }
+        
+        /* Expander 스타일 */
+        .streamlit-expanderHeader {
+            background-color: #f8f9fa !important;
+            border-radius: 8px !important;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            background-color: #e3f2fd !important;
+            border-color: #1f77b4;
+        }
+        
+        /* 탭 스타일 */
+        .stTabs [data-baseweb="tab-list"] { gap: 10px; }
+        .stTabs [data-baseweb="tab"] {
+            background-color: #f1f3f4;
+            border-radius: 4px; padding: 10px 20px; color: #555;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #1f77b4 !important; color: white !important; font-weight: bold;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 # 헤더
 st.title("🏭 디지털 트윈: 공급망 리스크 분석")
@@ -392,9 +467,13 @@ with forecast_tab1:
             'profit_delta': '영업이익 변화 ($)'
         },
         markers=True,
-        template='plotly_dark'
+        template=chart_template
     )
-    fig_price.update_traces(line_color='#00E5FF', marker_color='#00E5FF')
+    
+    # 테마별 색상 적용
+    line_col = '#00E5FF' if chart_template == 'plotly_dark' else '#1f77b4'
+    fig_price.update_traces(line_color=line_col, marker_color=line_col)
+    
     fig_price.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="손익분기점")
     fig_price.add_hline(y=-100000, line_dash="dash", line_color="red", annotation_text="위험 임계값")
     st.plotly_chart(fig_price, use_container_width=True)
@@ -417,9 +496,13 @@ with forecast_tab2:
             'production_loss': '생산 손실 (units)'
         },
         markers=True,
-        template='plotly_dark'
+        template=chart_template
     )
-    fig_delay.update_traces(line_color='#FF2B7D', marker_color='#FF2B7D')
+    
+    # 테마별 색상 적용 (Delay는 빨간 계열 유지)
+    line_col = '#FF2B7D' if chart_template == 'plotly_dark' else '#d62728'
+    fig_delay.update_traces(line_color=line_col, marker_color=line_col)
+    
     fig_delay.add_hline(y=500, line_dash="dash", line_color="orange", annotation_text="주의 임계값")
     fig_delay.add_hline(y=1000, line_dash="dash", line_color="red", annotation_text="위험 임계값")
     st.plotly_chart(fig_delay, use_container_width=True)
@@ -446,9 +529,12 @@ with forecast_tab3:
                 'predicted_profit_delta': '예상 영업이익 변화 ($)'
             },
             markers=True,
-            template='plotly_dark'
+            template=chart_template
         )
-        fig_trend.update_traces(line_color='#00E5FF', name='예상 영업이익')
+        
+        # 테마별 색상 적용
+        line_col = '#00E5FF' if chart_template == 'plotly_dark' else '#1f77b4'
+        fig_trend.update_traces(line_color=line_col, name='예상 영업이익')
         
         # 생산 손실도 추가 (보조 축)
         fig_trend.add_scatter(
