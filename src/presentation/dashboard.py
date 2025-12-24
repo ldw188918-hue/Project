@@ -39,6 +39,68 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- Custom CSS for Premium UI ---
+st.markdown("""
+<style>
+    /* 메인 타이틀 그라데이션 */
+    .block-container h1 {
+        background: linear-gradient(90deg, #00E5FF, #FF2B7D);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+    
+    /* 카드 스타일 (Glassmorphism) */
+    .stMetric {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        backdrop-filter: blur(10px);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    
+    .stMetric:hover {
+        transform: translateY(-2px);
+        border-color: #00E5FF;
+        box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+    }
+    
+    /* Expander 스타일 */
+    .streamlit-expanderHeader {
+        background-color: #1A1D24 !important;
+        border-radius: 8px !important;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        border-color: #FF2B7D;
+        color: #FF2B7D !important;
+    }
+    
+    /* 탭 스타일 */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background-color: #1A1D24;
+        border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 10px 20px;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: #00E5FF !important;
+        color: black !important;
+        font-weight: bold;
+    }
+    
+</style>
+""", unsafe_allow_html=True)
+
 # 헤더
 st.title("🏭 디지털 트윈: 공급망 리스크 분석")
 st.markdown("### 제조 분야 의사결정 지원 시스템 (DSS) - SOLID Architecture Ver.")
@@ -329,8 +391,10 @@ with forecast_tab1:
             'price_increase_pct': '가격 상승률 (%)',
             'profit_delta': '영업이익 변화 ($)'
         },
-        markers=True
+        markers=True,
+        template='plotly_dark'
     )
+    fig_price.update_traces(line_color='#00E5FF', marker_color='#00E5FF')
     fig_price.add_hline(y=0, line_dash="dash", line_color="gray", annotation_text="손익분기점")
     fig_price.add_hline(y=-100000, line_dash="dash", line_color="red", annotation_text="위험 임계값")
     st.plotly_chart(fig_price, use_container_width=True)
@@ -353,8 +417,9 @@ with forecast_tab2:
             'production_loss': '생산 손실 (units)'
         },
         markers=True,
-        color_discrete_sequence=['#EF553B']
+        template='plotly_dark'
     )
+    fig_delay.update_traces(line_color='#FF2B7D', marker_color='#FF2B7D')
     fig_delay.add_hline(y=500, line_dash="dash", line_color="orange", annotation_text="주의 임계값")
     fig_delay.add_hline(y=1000, line_dash="dash", line_color="red", annotation_text="위험 임계값")
     st.plotly_chart(fig_delay, use_container_width=True)
@@ -380,8 +445,10 @@ with forecast_tab3:
                 'day': '일수 (Days)',
                 'predicted_profit_delta': '예상 영업이익 변화 ($)'
             },
-            markers=True
+            markers=True,
+            template='plotly_dark'
         )
+        fig_trend.update_traces(line_color='#00E5FF', name='예상 영업이익')
         
         # 생산 손실도 추가 (보조 축)
         fig_trend.add_scatter(
