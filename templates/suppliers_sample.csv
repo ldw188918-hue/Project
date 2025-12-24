@@ -1,0 +1,6 @@
+Supplier_ID,Supplier_Name,Risk_Score,Base_Lead_Time_Days
+S1,현대모비스,0.15,5
+S2,LG에너지솔루션,0.25,7
+S3,만도,0.20,6
+S4,넥센타이어,0.30,8
+S5,삼성전자,0.18,5

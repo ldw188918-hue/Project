@@ -41,54 +41,60 @@ with st.sidebar.expander("📁 데이터 업로드", expanded=False):
     
     # 템플릿 다운로드
     st.markdown("**📥 템플릿 다운로드**")
-    col1, col2,col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
     
-    col1.download_button(
-        "부품",
-        templates['parts'],
-        "parts_template.csv",
-        "text/csv",
-        use_container_width=True
-    )
-    col2.download_button(
-        "공급사",
-        templates['suppliers'],
-        "suppliers_template.csv",
-        "text/csv",
-        use_container_width=True
-    )
-    col3.download_button(
-        "라인",
-        templates['production'],
-        "production_template.csv",
-        "text/csv",
-        use_container_width=True
-    )
+    with col1:
+        st.download_button(
+            "부품",
+            templates['parts'],
+            "parts_template.csv",
+            "text/csv",
+            use_container_width=True
+        )
+    with col2:
+        st.download_button(
+            "공급사",
+            templates['suppliers'],
+            "suppliers_template.csv",
+            "text/csv",
+            use_container_width=True
+        )
+    with col3:
+        st.download_button(
+            "라인",
+            templates['production'],
+            "production_template.csv",
+            "text/csv",
+            use_container_width=True
+        )
     
     st.divider()
     
     # CSV 업로드
     st.markdown("**📤 CSV 업로드**")
-    parts_file = st.file_uploader(
-        "부품", 
-        type=['csv'],
-        key='parts_upload',
-        label_visibility="collapsed"
-    )
     
-    suppliers_file = st.file_uploader(
-        "공급사",
-        type=['csv'],
-        key='suppliers_upload',
-        label_visibility="collapsed"
-    )
-    
-    production_file = st.file_uploader(
-        "라인",
-        type=['csv'],
-        key='production_upload',
-        label_visibility="collapsed"
-    )
+    # 업로드 섹션을 더 컴팩트하게 표현
+    with st.container():
+        parts_file = st.file_uploader(
+            "부품 데이터", 
+            type=['csv'],
+            key='parts_upload',
+            help="부품 정보 CSV 파일을 업로드하세요"
+        )
+        
+        suppliers_file = st.file_uploader(
+            "공급사 데이터",
+            type=['csv'],
+            key='suppliers_upload',
+            help="공급사 정보 CSV 파일을 업로드하세요"
+        )
+        
+        production_file = st.file_uploader(
+            "생산라인 데이터",
+            type=['csv'],
+            key='production_upload',
+            help="생산라인 정보 CSV 파일을 업로드하세요"
+        )
 
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)
 @st.cache_data
