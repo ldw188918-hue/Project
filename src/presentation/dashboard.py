@@ -2,9 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 아키텍처 변경에 따른 새로운 임포트 경로
-from src.infrastructure.repositories import SimulationRepository
-from src.application.services import SimulationService
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from infrastructure.repositories import SimulationRepository
+from application.services import SimulationService
 
 # 페이지 설정
 st.set_page_config(
