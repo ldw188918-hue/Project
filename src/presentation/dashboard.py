@@ -3,13 +3,19 @@ import pandas as pd
 import plotly.express as px
 
 import sys
+import importlib
 from pathlib import Path
 
 # src 디렉토리를 Python 경로에 추가
 src_path = Path(__file__).parent.parent
 sys.path.insert(0, str(src_path))
 
+# 모듈 강제 리로드 (캐싱 문제 해결용)
+if 'infrastructure.repositories' in sys.modules:
+    importlib.reload(sys.modules['infrastructure.repositories'])
+
 from infrastructure.repositories import SimulationRepository
+from application.services import SimulationService
 from application.services import SimulationService
 
 # 페이지 설정
