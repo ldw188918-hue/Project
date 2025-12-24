@@ -19,7 +19,7 @@ class SimulationService:
         strategies: List[ISimulationStrategy] = []
         
         # 전략 선택 로직 (Factory 역할 겸임)
-        if price_increase_pct > 0:
+        if price_increase_pct != 0:
             strategies.append(PriceHikeStrategy(price_increase_pct))
             
         if delay_days > 0:
