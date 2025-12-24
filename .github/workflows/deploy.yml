@@ -20,14 +20,14 @@ jobs:
       with:
         python-version: "3.11" # Stlite needs 3.11+ often
 
-    - name: Install Stlite CLI
-      run: pip install stlite
+    - name: Install Dependencies
+      run: |
+        pip install streamlit pandas numpy plotly
+        npm install -g @stlite/cli
 
     - name: Build Stlite App
-      # src/presentation/dashboard.py를 진입점으로 마운트
-      # src 패키지 전체를 포함시켜야 임포트 오류가 안 남
       run: |
-        stlite mount src/presentation/dashboard.py --root_dir . --out build
+        stlite build src/presentation/dashboard.py --output build
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
