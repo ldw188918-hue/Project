@@ -127,11 +127,8 @@ if parts_file or suppliers_file or production_file:
 
 service = get_simulation_service(parts_file, suppliers_file, production_file)
 
-# 기존 레거시 데이터프레임 접근 (차트 그리기용, 서비스에서 데이터를 DTO로 꺼내오는 게 정석이나 편의상 컨텍스트 활용)
 # 하지만 순수하게 하기 위해 서비스나 리포지토리에서 DF 변환 메서드를 제공하는 것이 좋음.
-# 여기서는 시각화를 위해 Context 데이터를 DataFrame으로 변환.
 context = service.context
-df_parts = pd.DataFrame([vars(p) for p in context.parts])
 
 
 # 사이드바
@@ -348,10 +345,5 @@ with forecast_tab3:
     else:
         st.info("시뮬레이션 변수를 조절하면 향후 트렌드 예측이 표시됩니다.")
 
-# 차트 영역 (기존 코드 재활용하되 데이터 소스를 Context로 변경)
-st.markdown("---")
-# ... (차트 부분은 그대로 두거나 필요시 업데이트) ...
-# 간소화를 위해 상세 데이터만 표시
-st.subheader("📉 상세 데이터")
-st.dataframe(df_parts)
+
 

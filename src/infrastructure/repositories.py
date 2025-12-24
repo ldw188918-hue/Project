@@ -72,18 +72,22 @@ class SimulationRepository:
         # 업로드된 파일이 있으면 덮어쓰기
         try:
             if parts_csv is not None:
+                print(f"DEBUG: parts_csv type: {type(parts_csv)}")
                 if hasattr(parts_csv, 'seek'):
                     parts_csv.seek(0)
                 raw_data['parts'] = pd.read_csv(parts_csv)
             if suppliers_csv is not None:
+                print(f"DEBUG: suppliers_csv type: {type(suppliers_csv)}")
                 if hasattr(suppliers_csv, 'seek'):
                     suppliers_csv.seek(0)
                 raw_data['suppliers'] = pd.read_csv(suppliers_csv)
             if production_csv is not None:
+                print(f"DEBUG: production_csv type: {type(production_csv)}")
                 if hasattr(production_csv, 'seek'):
                     production_csv.seek(0)
                 raw_data['production'] = pd.read_csv(production_csv)
         except Exception as e:
+            print(f"ERROR in load_context_from_uploads: {e}")
             # 에러 발생 시 로그를 남기거나 처리할 수 있음 (여기선 간단히 pass 또는 re-raise)
             # print(f"Error reading CSV: {e}")
             raise e
