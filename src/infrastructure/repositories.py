@@ -97,40 +97,67 @@ class SimulationRepository:
     def _build_context(self, raw_data: dict) -> SimulationContext:
         """DataFrame을 도메인 모델로 변환"""
         
-        # 1. Suppliers
-        suppliers = []
-        for _, row in raw_data['suppliers'].iterrows():
-            suppliers.append(Supplier(
-                id=row['Supplier_ID'],
-                name=row['Supplier_Name'],
-                risk_score=row['Risk_Score'],
-                base_lead_time_days=int(row['Base_Lead_Time_Days'])
-            ))
+        try:
+            # 1. Suppliers
+            suppliers = []
+            if 'suppliers' in raw_data and not raw_data['suppliers'].empty:
+                # 필수 컬럼 검사
+                required_cols = ['Supplier_ID', 'Supplier_Name', 'Risk_Score', 'Base_Lead_Time_Days']
+                missing = [col for col in required_cols if col not in raw_data['suppliers'].columns]
+                if missing:
+                    raise ValueError(f"공급사 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
+
+                for _, row in raw_data['suppliers'].iterrows():
+                    suppliers.append(Supplier(
+                        id=row['Supplier_ID'],
+                        name=row['Supplier_Name'],
+                        risk_score=row['Risk_Score'],
+                        base_lead_time_days=int(row['Base_Lead_Time_Days'])
+                    ))
+                
+            # 2. Parts
+            parts = []
+            if 'parts' in raw_data and not raw_data['parts'].empty:
+                required_cols = ['Part_ID', 'Part_Name', 'Supplier_ID', 'Unit_Price', 'Current_Inventory', 'Daily_Usage_Rate']
+                missing = [col for col in required_cols if col not in raw_data['parts'].columns]
+                if missing:
+                    raise ValueError(f"부품 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
+
+                for _, row in raw_data['parts'].iterrows():
+                    parts.append(Part(
+                        id=row['Part_ID'],
+                        name=row['Part_Name'],
+                        supplier_id=row['Supplier_ID'],
+                        unit_price=float(row['Unit_Price']),
+                        current_inventory=int(row['Current_Inventory']),
+                        daily_usage_rate=int(row['Daily_Usage_Rate'])
+                    ))
+                
+            # 3. Production Lines
+            lines = []
+            if 'production' in raw_data and not raw_data['production'].empty:
+                required_cols = ['Line_ID', 'Line_Name', 'Capacity_Per_Day', 'Efficiency_Rate']
+                missing = [col for col in required_cols if col not in raw_data['production'].columns]
+                if missing:
+                    raise ValueError(f"생산라인 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
+
+                for _, row in raw_data['production'].iterrows():
+                    lines.append(ProductionLine(
+                        id=row['Line_ID'],
+                        name=row['Line_Name'],
+                        capacity_per_day=int(row['Capacity_Per_Day']),
+                        efficiency_rate=float(row['Efficiency_Rate'])
+                    ))
+                
+            return SimulationContext(
+                parts=parts,
+                suppliers=suppliers,
+                production_lines=lines
+            )
             
-        # 2. Parts
-        parts = []
-        for _, row in raw_data['parts'].iterrows():
-            parts.append(Part(
-                id=row['Part_ID'],
-                name=row['Part_Name'],
-                supplier_id=row['Supplier_ID'],
-                unit_price=float(row['Unit_Price']),
-                current_inventory=int(row['Current_Inventory']),
-                daily_usage_rate=int(row['Daily_Usage_Rate'])
-            ))
-            
-        # 3. Production Lines
-        lines = []
-        for _, row in raw_data['production'].iterrows():
-            lines.append(ProductionLine(
-                id=row['Line_ID'],
-                name=row['Line_Name'],
-                capacity_per_day=int(row['Capacity_Per_Day']),
-                efficiency_rate=float(row['Efficiency_Rate'])
-            ))
-            
-        return SimulationContext(
-            parts=parts,
-            suppliers=suppliers,
-            production_lines=lines
-        )
+        except KeyError as e:
+            raise ValueError(f"데이터 컬럼 오류: {str(e)} 컬럼을 찾을 수 없습니다. 템플릿을 확인해주세요.")
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"데이터 변환 중 알 수 없는 오류 발생: {str(e)}")
