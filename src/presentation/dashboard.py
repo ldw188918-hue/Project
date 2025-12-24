@@ -78,12 +78,22 @@ if st.session_state['theme'] == 'Dark Mode':
             background-color: #1A1D24;
         }
         
-        /* 텍스트 색상 강제 (기본 테마가 Light이므로 덮어씌워야 함) */
-        p, h1, h2, h3, h4, h5, h6, li, span, div {
+        /* 텍스트 색상 강제 (Heading, Paragraph, List만) */
+        h1, h2, h3, h4, h5, h6, p, li, .stMarkdown {
             color: #FFFFFF !important;
         }
-        .stMarkdown {
+        
+        /* Alert Box 스타일링 (Dark Mode 호환) */
+        div[data-baseweb="notification"], div[class*="stAlert"] {
+            background-color: #1A1D24 !important;
             color: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Alert 내부 아이콘 색상 보정 */
+        div[data-baseweb="notification"] svg, div[class*="stAlert"] svg {
+            color: #FFFFFF !important;
+            fill: #FFFFFF !important;
         }
 
         /* 메인 타이틀 그라데이션 */
