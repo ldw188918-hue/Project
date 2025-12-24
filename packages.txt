@@ -1,2 +1,1 @@
-# 시스템 레벨 패키지 (필요시 추가)
-# 예: build-essential, libpq-dev 등
+# Empty - no system packages required
