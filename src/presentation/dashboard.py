@@ -114,6 +114,21 @@ if st.session_state['theme'] == 'Dark Mode':
             transition: transform 0.2s ease, border-color 0.2s ease;
         }
         
+        /* Radio Button & Checkbox 스타일링 */
+        div[role="radiogroup"] label, div[data-baseweb="checkbox"] label {
+            color: #FFFFFF !important;
+        }
+        
+        /* 라디오/체크박스 선택된 상태 색상 강제 (Cyan) */
+        div[role="radiogroup"] div[aria-checked="true"], 
+        div[data-baseweb="checkbox"] div[aria-checked="true"] {
+            background-color: #00E5FF !important;
+            border-color: #00E5FF !important;
+        }
+        div[role="radiogroup"] div[aria-checked="true"] div {
+            background-color: #0E1117 !important;
+        }
+
         /* 테마별 Metric Label 색상 교정 */
         .stMetric label {
             color: #E0E0E0 !important;
