@@ -1,0 +1,9 @@
+Part_ID,Part_Name,Supplier_ID,Unit_Price,Current_Inventory,Daily_Usage_Rate
+P1,Steel Sheet,S1,250.0,800,60
+P2,Aluminum Frame,S1,180.0,400,40
+P3,Copper Wire,S2,320.0,300,25
+P4,Plastic Housing,S2,95.0,700,50
+P5,Electronic Board,S3,450.0,200,15
+P6,Motor Assembly,S3,680.0,150,10
+P7,Rubber Seal,S1,45.0,1000,80
+P8,Glass Panel,S2,210.0,350,30

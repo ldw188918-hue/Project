@@ -36,59 +36,58 @@ def load_templates():
 templates = load_templates()
 
 # 사이드바 - CSV 업로드
-with st.sidebar.expander("📁 데이터 업로드 (선택사항)", expanded=False):
-    st.markdown("**자체 데이터로 시뮬레이션하기**")
-    st.markdown("CSV 템플릿을 다운로드하여 수정 후 업로드하세요.")
+with st.sidebar.expander("📁 데이터 업로드", expanded=False):
+    st.caption("자체 데이터로 시뮬레이션")
     
-    # 템플릿 다운로드 버튼
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.download_button(
-            label="📥 부품",
-            data=templates['parts'],
-            file_name="parts_template.csv",
-            mime="text/csv",
-            help="부품 데이터 템플릿"
-        )
-    with col2:
-        st.download_button(
-            label="📥 공급사",
-            data=templates['suppliers'],
-            file_name="suppliers_template.csv",
-            mime="text/csv",
-            help="공급사 데이터 템플릿"
-        )
-    with col3:
-        st.download_button(
-            label="📥 생산라인",
-            data=templates['production'],
-            file_name="production_template.csv",
-            mime="text/csv",
-            help="생산라인 데이터 템플릿"
-        )
+    # 템플릿 다운로드
+    st.markdown("**📥 템플릿 다운로드**")
+    col1, col2,col3 = st.columns(3)
     
-    st.markdown("---")
+    col1.download_button(
+        "부품",
+        templates['parts'],
+        "parts_template.csv",
+        "text/csv",
+        use_container_width=True
+    )
+    col2.download_button(
+        "공급사",
+        templates['suppliers'],
+        "suppliers_template.csv",
+        "text/csv",
+        use_container_width=True
+    )
+    col3.download_button(
+        "라인",
+        templates['production'],
+        "production_template.csv",
+        "text/csv",
+        use_container_width=True
+    )
     
-    # CSV 업로드 위젯
+    st.divider()
+    
+    # CSV 업로드
+    st.markdown("**📤 CSV 업로드**")
     parts_file = st.file_uploader(
-        "부품 데이터 (CSV)", 
+        "부품", 
         type=['csv'],
         key='parts_upload',
-        help="열: Part_ID, Part_Name, Supplier_ID, Unit_Price, Current_Inventory, Daily_Usage_Rate"
+        label_visibility="collapsed"
     )
     
     suppliers_file = st.file_uploader(
-        "공급사 데이터 (CSV)",
+        "공급사",
         type=['csv'],
         key='suppliers_upload',
-        help="열: Supplier_ID, Supplier_Name, Risk_Score, Base_Lead_Time_Days"
+        label_visibility="collapsed"
     )
     
     production_file = st.file_uploader(
-        "생산라인 데이터 (CSV)",
+        "라인",
         type=['csv'],
         key='production_upload',
-        help="열: Line_ID, Line_Name, Capacity_Per_Day, Efficiency_Rate"
+        label_visibility="collapsed"
     )
 
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)

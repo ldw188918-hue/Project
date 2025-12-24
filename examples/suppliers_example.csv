@@ -1,0 +1,4 @@
+Supplier_ID,Supplier_Name,Risk_Score,Base_Lead_Time_Days
+S1,Korea Steel Co.,0.2,5
+S2,China Manufacturing Ltd.,0.6,12
+S3,Japan Electronics Inc.,0.3,8

@@ -1,0 +1,5 @@
+Line_ID,Line_Name,Capacity_Per_Day,Efficiency_Rate
+L1,Assembly Line A,200,0.92
+L2,Assembly Line B,180,0.88
+L3,Packaging Line,250,0.95
+L4,Quality Control Line,150,0.98
