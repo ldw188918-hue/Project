@@ -1,5 +1,5 @@
-from src.domain.interfaces import ISimulationStrategy
-from src.domain.models import SimulationContext, SimulationResult
+from domain.interfaces import ISimulationStrategy
+from domain.models import SimulationContext, SimulationResult
 
 class PriceHikeStrategy(ISimulationStrategy):
     def __init__(self, price_increase_pct: float):

@@ -61,6 +61,16 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
+> **💡 Windows PowerShell에서 오류가 발생한 경우:**
+> 
+> 오류 메시지: `"이 시스템에서 스크립트를 실행할 수 없으므로..."`
+> 
+> **해결 방법**: PowerShell 실행 정책 변경
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+> 위 명령어 실행 후 다시 `venv\Scripts\activate`를 시도하세요.
+
 ### 1-3. 의존성 패키지 설치
 ```bash
 pip install -r requirements.txt
@@ -156,8 +166,14 @@ streamlit run src/presentation/dashboard.py
 def test_exchange_rate_strategy():
     from src.domain.strategies import ExchangeRateStrategy
     
-    part = Part(id="P1", name="Part1", supplier_id="S1", 
-                unit_price=100.0, current_inventory=10, daily_usage_rate=1)
+    part = Part(
+        id="P1", 
+        name="Part1", 
+        supplier_id="S1", 
+        unit_price=100.0, 
+        current_inventory=10, 
+        monthly_usage=30  # 월간 사용량
+    )
     context = SimulationContext(parts=[part], suppliers=[], production_lines=[])
     
     # 환율 10% 상승 시뮬레이션
@@ -234,7 +250,7 @@ git push origin main
 `src/presentation/dashboard.py` 수정:
 
 ```python
-# 사이드바에 슬라이더 추가
+# 사이드바에 슬라이더 추가 (기존 슬라이더들 다음에 추가)
 exchange_rate = st.sidebar.slider(
     "환율 상승률 (%)",
     min_value=0.0,
@@ -242,14 +258,53 @@ exchange_rate = st.sidebar.slider(
     value=0.0,
     step=1.0
 )
-
-# SimulationService에 전달 (services.py도 수정 필요)
 ```
 
-### 7-2. 로컬에서 확인
+### 7-2. SimulationService에 환율 전략 추가
+`src/application/services.py` 수정:
+
+```python
+# 1. 상단 import 추가
+from src.domain.strategies import PriceHikeStrategy, DelayImpactStrategy, ExchangeRateStrategy
+
+# 2. run_simulation 메서드 시그니처 수정
+def run_simulation(self, price_increase_pct: float, delay_days: int, exchange_rate_pct: float = 0.0) -> SimulationResult:
+    """
+    사용자 입력(가격, 지연, 환율)을 받아 적절한 전략을 수립하고 실행 결과를 합산 반환한다.
+    """
+    strategies: List[ISimulationStrategy] = []
+    
+    # 전략 선택 로직
+    if price_increase_pct > 0:
+        strategies.append(PriceHikeStrategy(price_increase_pct))
+        
+    if delay_days > 0:
+        strategies.append(DelayImpactStrategy(delay_days))
+    
+    # 환율 전략 추가
+    if exchange_rate_pct > 0:
+        strategies.append(ExchangeRateStrategy(exchange_rate_pct))
+    
+    # ... (나머지 코드는 동일)
+```
+
+### 7-3. Dashboard에서 서비스 호출 수정
+`src/presentation/dashboard.py`에서 서비스 호출 부분 수정:
+
+```python
+# 기존 코드 찾기:
+# result = service.run_simulation(price_increase, delay_days)
+
+# 변경 후:
+result = service.run_simulation(price_increase, delay_days, exchange_rate)
+```
+
+### 7-4. 로컬에서 확인
 ```bash
 streamlit run src/presentation/dashboard.py
 ```
+
+대시보드에서 환율 슬라이더를 조작하여 영업이익 변화를 확인하세요!
 
 ---
 
@@ -263,6 +318,66 @@ streamlit run src/presentation/dashboard.py
 - [ ] 새로운 시뮬레이션 전략 추가 (TDD 실습)
 - [ ] GitHub Actions CI/CD 파이프라인 확인
 - [ ] GitHub Pages 배포 확인
+- [ ] Streamlit Community Cloud 배포 (선택)
+
+---
+
+## 🚀 Step 8: 대시보드 배포하기 (Streamlit Community Cloud)
+
+### 8-1. Streamlit Community Cloud 개요
+
+Streamlit Community Cloud는 **무료**로 Streamlit 앱을 호스팅할 수 있는 서비스입니다.
+
+**장점**:
+- ✅ 완전 무료 (개인 프로젝트)
+- ✅ GitHub 레포지토리와 직접 연동
+- ✅ 자동 배포 (main 브랜치 푸시 시)
+- ✅ HTTPS 기본 제공
+
+### 8-2. 배포 단계
+
+#### 1단계: Streamlit Community Cloud 가입
+1. [streamlit.io/cloud](https://streamlit.io/cloud) 접속
+2. "Sign up" 클릭
+3. GitHub 계정으로 로그인
+
+#### 2단계: 새 앱 배포
+1. 대시보드에서 **"New app"** 클릭
+2. 다음 정보 입력:
+   - **Repository**: `본인계정/Project`
+   - **Branch**: `main`
+   - **Main file path**: `src/presentation/dashboard.py`
+3. **"Deploy!"** 클릭
+
+#### 3단계: 배포 대기
+- 처음 배포 시 2~3분 소요
+- 진행 상황이 화면에 표시됨
+- 완료되면 자동으로 앱이 실행됨
+
+#### 4단계: URL 확인 및 공유
+- 배포 완료 후 생성된 URL 복사
+- 형식: `https://share.streamlit.io/본인계정/Project/main/src/presentation/dashboard.py`
+- 이 URL을 README.md에 업데이트
+
+### 8-3. 자동 재배포 설정
+
+GitHub에 새 코드를 푸시하면 자동으로 앱이 업데이트됩니다:
+
+```bash
+git add .
+git commit -m "Feat: 새 기능 추가"
+git push origin main
+```
+
+Streamlit Cloud가 자동으로 감지하여 앱을 재배포합니다 (약 1-2분 소요).
+
+### 8-4. 배포 문제 해결
+
+**Q: 앱이 실행되지 않습니다.**  
+A: Streamlit Cloud 대시보드에서 로그를 확인하세요. 주로 의존성 문제입니다.
+
+**Q: 모듈을 찾을 수 없다는 오류가 발생합니다.**  
+A: `requirements.txt`에 모든 필요한 패키지가 포함되어 있는지 확인하세요.
 
 ---
 
@@ -277,6 +392,7 @@ streamlit run src/presentation/dashboard.py
 - [SOLID 원칙 설명](https://ko.wikipedia.org/wiki/SOLID_(%EA%B0%9D%EC%B2%B4_%EC%A7%80%ED%96%A5_%EC%84%A4%EA%B3%84))
 - [TDD 가이드](https://martinfowler.com/bliki/TestDrivenDevelopment.html)
 - [Streamlit 공식 문서](https://docs.streamlit.io)
+- [Streamlit Community Cloud 문서](https://docs.streamlit.io/streamlit-community-cloud)
 
 ---
 
@@ -291,7 +407,24 @@ A: 가상환경이 활성화되었는지 확인하세요. `which python` (macOS/
 **Q3. GitHub Pages에 배포했는데 빈 페이지만 나옵니다.**  
 A: Settings > Pages에서 Source가 `gh-pages` 브랜치로 설정되었는지 확인하세요.
 
+**Q4. Windows에서 가상환경 활성화가 실패합니다.**  
+A: PowerShell 실행 정책을 확인하세요.
+```powershell
+# 현재 정책 확인
+Get-ExecutionPolicy
+
+# RemoteSigned로 변경
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Q5. "ModuleNotFoundError: No module named 'src'" 오류가 발생합니다.**  
+A: 프로젝트 루트 디렉토리(`Project/`)에서 실행하는지 확인하세요. `pwd` (macOS/Linux) 또는 `cd` (Windows)로 현재 위치를 확인할 수 있습니다.
+
+**Q6. Streamlit Community Cloud 배포 시 "Module not found" 오류가 발생합니다.**  
+A: `requirements.txt`에 필요한 모든 패키지가 명시되어 있는지 확인하세요. 로컬에서 사용하는 패키지와 버전을 정확히 기록해야 합니다.
+
 ---
 
 **축하합니다! 🎉**  
-이제 엔터프라이즈급 아키텍처를 갖춘 프로젝트를 처음부터 끝까지 다룰 수 있습니다!
+이제 엔터프라이즈급 아키텍처를 갖춘 프로젝트를 처음부터 끝까지 다루고 온라인에 배포할 수 있습니다!
+

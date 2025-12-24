@@ -4,6 +4,16 @@
 >
 > 제조업 현장의 불확실성(Uncertainty)을 통제 가능한 리스크(Risk)로 변환하는 **Digital Twin 기반 의사결정 지원 시스템(DSS)**입니다.
 
+## 🌐 온라인 데모
+
+- **라이브 대시보드**: [Streamlit Community Cloud에서 실행하기](https://share.streamlit.io/ldw188918-hue/Project/main/src/presentation/dashboard.py) 🚀
+- **프로젝트 홈페이지**: [GitHub Pages](https://ldw188918-hue.github.io/Project/) 📄
+
+> [!NOTE]
+> Streamlit Community Cloud 배포 URL은 초기 배포 후 업데이트됩니다.
+
+---
+
 ## 1. 프로젝트 소개 (Overview)
 글로벌 공급망 이슈는 더 이상 예측 불가능한 재난이 아닙니다. 본 프로젝트는 한화시스템과 같은 제조 기업이 직면한 **부품 수급 불안정**과 **원자재 가격 변동**이 생산 라인과 영업이익에 미치는 영향을 **실시간으로 시뮬레이션**합니다.
 
@@ -46,15 +56,26 @@
 *   **Deployment**: Stlite (WebAssembly) -> GitHub Pages
 
 ## 4. 실행 및 테스트 (How to Run)
+
+### 온라인에서 실행 (권장)
+1. [Streamlit Community Cloud 대시보드](https://share.streamlit.io/ldw188918-hue/Project/main/src/presentation/dashboard.py)에 접속
+2. 좌측 사이드바에서 시뮬레이션 변수 조절
+3. 실시간으로 공급망 리스크 분석 확인
+
 ### 로컬 환경 실행
 ```bash
 # 1. 레포지토리 클론
-git clone https://github.com/your-username/digital-twin-dashboard.git
+git clone https://github.com/ldw188918-hue/Project.git
+cd Project
 
-# 2. 의존성 설치
+# 2. 가상환경 생성 및 활성화 (Windows)
+python -m venv venv
+venv\Scripts\activate
+
+# 3. 의존성 설치
 pip install -r requirements.txt
 
-# 3. 대시보드 실행
+# 4. 대시보드 실행
 streamlit run src/presentation/dashboard.py
 ```
 
@@ -63,6 +84,22 @@ streamlit run src/presentation/dashboard.py
 # 단위 테스트 수행
 pytest tests/
 ```
+
+---
+
+## 5. Streamlit Community Cloud 배포 방법
+
+본 프로젝트를 직접 배포하려면:
+
+1. GitHub 레포지토리를 본인 계정으로 fork
+2. [Streamlit Community Cloud](https://streamlit.io/cloud)에 접속 (무료)
+3. GitHub 계정으로 로그인
+4. "New app" 클릭
+5. Repository 선택: `your-username/Project`
+6. Main file path: `src/presentation/dashboard.py`
+7. "Deploy!" 클릭
+
+배포 후 생성된 URL을 README.md에 업데이트하세요.
 
 ---
 *Developed by [Your Name] for Portfolio Demonstration.*

@@ -24,14 +24,158 @@ jobs:
       run: |
         pip install streamlit pandas numpy plotly
         
-    - name: Create static page
+    - name: Create landing page
       run: |
         mkdir -p build
-        echo "# Digital Twin Dashboard" > build/index.html
-        echo "<h1>Digital Twin 공급망 리스크 분석 대시보드</h1>" >> build/index.html
-        echo "<p>이 프로젝트는 로컬 환경에서 실행 가능한 Streamlit 애플리케이션입니다.</p>" >> build/index.html
-        echo "<p>실행 방법: <code>streamlit run src/presentation/dashboard.py</code></p>" >> build/index.html
-        echo "<p>GitHub Repository: <a href='https://github.com/ldw188918-hue/Project'>https://github.com/ldw188918-hue/Project</a></p>" >> build/index.html
+        cat > build/index.html << 'HTMLEOF'
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Digital Twin 공급망 리스크 분석 대시보드</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                }
+                .container {
+                    background: white;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    max-width: 800px;
+                    padding: 60px 40px;
+                    text-align: center;
+                }
+                h1 { font-size: 2.5em; color: #2d3748; margin-bottom: 20px; }
+                .emoji { font-size: 1.2em; }
+                p { color: #4a5568; font-size: 1.1em; line-height: 1.6; margin: 20px 0; }
+                .cta-button {
+                    display: inline-block;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 18px 40px;
+                    border-radius: 50px;
+                    text-decoration: none;
+                    font-size: 1.2em;
+                    font-weight: bold;
+                    margin: 30px 10px;
+                    transition: transform 0.3s, box-shadow 0.3s;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                }
+                .cta-button:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+                }
+                .secondary-button {
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+                }
+                .secondary-button:hover { box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6); }
+                .features {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 20px;
+                    margin: 40px 0;
+                }
+                .feature {
+                    background: #f7fafc;
+                    padding: 25px;
+                    border-radius: 10px;
+                    border: 2px solid #e2e8f0;
+                }
+                .feature h3 { color: #2d3748; margin-bottom: 10px; }
+                .feature p { font-size: 0.95em; margin: 0; }
+                .code {
+                    background: #2d3748;
+                    color: #68d391;
+                    padding: 15px;
+                    border-radius: 8px;
+                    font-family: 'Courier New', monospace;
+                    text-align: left;
+                    margin: 20px 0;
+                    overflow-x: auto;
+                }
+                .tech-stack {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
+                    margin: 30px 0;
+                }
+                .tech-badge {
+                    background: #edf2f7;
+                    color: #4a5568;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 0.9em;
+                    font-weight: 600;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1><span class="emoji">🏭</span> Digital Twin 공급망 리스크 분석</h1>
+                <p><strong>제조 분야 의사결정 지원 시스템 (DSS)</strong></p>
+                <p>데이터를 넘어, 의사결정의 확신으로. SOLID 아키텍처 기반 엔터프라이즈급 시뮬레이션 엔진</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>⚡ What-If 시뮬레이션</h3>
+                        <p>원자재 가격 변동과 공급 지연이 미치는 영향을 실시간으로 분석</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🎯 SOLID 아키텍처</h3>
+                        <p>확장 가능하고 유지보수가 쉬운 클린 코드 설계</p>
+                    </div>
+                    <div class="feature">
+                        <h3>✅ TDD 방식</h3>
+                        <p>100% 테스트 커버리지로 검증된 비즈니스 로직</p>
+                    </div>
+                </div>
+
+                <a href="https://share.streamlit.io/YOUR_USERNAME/Project/main/src/presentation/dashboard.py" class="cta-button">
+                    <span class="emoji">🚀</span> 대시보드 실행하기
+                </a>
+                <a href="https://github.com/ldw188918-hue/Project" class="cta-button secondary-button">
+                    <span class="emoji">💻</span> GitHub 소스코드
+                </a>
+
+                <h2 style="margin-top: 50px; color: #2d3748;">🛠️ 로컬 실행 방법</h2>
+                <div class="code"># 1. 레포지토리 클론<br>
+git clone https://github.com/ldw188918-hue/Project.git<br>
+cd Project<br><br>
+# 2. 가상환경 생성 및 활성화<br>
+python -m venv venv<br>
+venv\Scripts\activate  # Windows<br><br>
+# 3. 의존성 설치<br>
+pip install -r requirements.txt<br><br>
+# 4. 대시보드 실행<br>
+streamlit run src/presentation/dashboard.py</div>
+
+                <h3 style="margin-top: 40px; color: #2d3748;">📚 기술 스택</h3>
+                <div class="tech-stack">
+                    <span class="tech-badge">Python 3.10+</span>
+                    <span class="tech-badge">Streamlit</span>
+                    <span class="tech-badge">Pandas</span>
+                    <span class="tech-badge">Plotly</span>
+                    <span class="tech-badge">Pytest</span>
+                    <span class="tech-badge">GitHub Actions</span>
+                </div>
+
+                <p style="margin-top: 40px; font-size: 0.9em; color: #718096;">
+                    Built with ❤️ using SOLID principles and TDD methodology
+                </p>
+            </div>
+        </body>
+        </html>
+        HTMLEOF
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

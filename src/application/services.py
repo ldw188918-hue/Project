@@ -1,7 +1,7 @@
 from typing import List, Optional
-from src.domain.models import SimulationContext, SimulationResult, Part, Supplier, ProductionLine
-from src.domain.interfaces import ISimulationStrategy
-from src.domain.strategies import PriceHikeStrategy, DelayImpactStrategy
+from domain.models import SimulationContext, SimulationResult, Part, Supplier, ProductionLine
+from domain.interfaces import ISimulationStrategy
+from domain.strategies import PriceHikeStrategy, DelayImpactStrategy
 
 class SimulationService:
     """

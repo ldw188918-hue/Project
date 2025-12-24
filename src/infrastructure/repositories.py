@@ -1,15 +1,50 @@
 from typing import List
-from src.domain.models import Supplier, Part, ProductionLine, SimulationContext
-from src.data_loader import generate_synthetic_data # 기존 로직 재활용하지만 Repository 패턴으로 감쌈
+import pandas as pd
+from domain.models import Supplier, Part, ProductionLine, SimulationContext
+
+def _generate_mock_data():
+    """Mock 데이터 생성 (기존 generate_synthetic_data 대체)"""
+    
+    # Suppliers 데이터
+    suppliers_data = {
+        'Supplier_ID': ['S1', 'S2', 'S3'],
+        'Supplier_Name': ['Supplier A', 'Supplier B', 'Supplier C'],
+        'Risk_Score': [0.3, 0.5, 0.2],
+        'Base_Lead_Time_Days': [7, 10, 5]
+    }
+    
+    # Parts 데이터
+    parts_data = {
+        'Part_ID': ['P1', 'P2', 'P3', 'P4', 'P5'],
+        'Part_Name': ['Part Alpha', 'Part Beta', 'Part Gamma', 'Part Delta', 'Part Epsilon'],
+        'Supplier_ID': ['S1', 'S1', 'S2', 'S2', 'S3'],
+        'Unit_Price': [100.0, 150.0, 200.0, 80.0, 120.0],
+        'Current_Inventory': [500, 300, 200, 600, 400],
+        'Daily_Usage_Rate': [50, 30, 20, 40, 25]
+    }
+    
+    # Production 데이터
+    production_data = {
+        'Line_ID': ['L1', 'L2', 'L3'],
+        'Line_Name': ['Line 1', 'Line 2', 'Line 3'],
+        'Capacity_Per_Day': [100, 150, 120],
+        'Efficiency_Rate': [0.95, 0.90, 0.92]
+    }
+    
+    return {
+        'suppliers': pd.DataFrame(suppliers_data),
+        'parts': pd.DataFrame(parts_data),
+        'production': pd.DataFrame(production_data)
+    }
 
 class SimulationRepository:
     """
     SimulationRepository
     - 데이터 소스(CSV, DB, API, Mock)로부터 도메인 모델을 로드한다.
-    - 현재는 기존의 generate_synthetic_data 함수를 어댑터 패턴으로 연결.
+    - 현재는 내부 mock 데이터를 사용합니다.
     """
     def load_context(self) -> SimulationContext:
-        raw_data = generate_synthetic_data()
+        raw_data = _generate_mock_data()
         
         # 1. Suppliers
         suppliers = []
