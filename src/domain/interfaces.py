@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.domain.models import SimulationContext, SimulationResult
+from domain.models import SimulationContext, SimulationResult
 
 class ISimulationStrategy(ABC):
     """
