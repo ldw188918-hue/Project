@@ -22,22 +22,6 @@
 ### 🏗️ SOLID 아키텍처 설계
 변화하는 비즈니스 요구사항(새로운 리스크 시나리오 등)에 유연하게 대응하기 위해 **Layered Architecture**와 **SOLID 원칙**을 철저히 준수했습니다.
 
-```mermaid
-graph TD
-    User((User)) --> UI[Presentation Layer<br>(Streamlit Dashboard)]
-    UI --> Service[Application Layer<br>(Simulation Service)]
-    
-    subgraph Domain Layer [Core Business Logic]
-        Service --> Strategy{Simulation<br>Strategy}
-        Strategy -->|Implement| Price[PriceHikeStrategy]
-        Strategy -->|Implement| Delay[DelayImpactStrategy]
-        Strategy --> Model[Domain Models<br>(Plant/Part/Supplier)]
-    end
-    
-    Service --> Repo[Infrastructure Layer<br>(Data Repository)]
-    Repo --> Data[(Synthetic Data / DB)]
-```
-
 *   **OCP (Open-Closed Principle)**: 새로운 시뮬레이션 로직(예: 환율 변동) 추가 시 기존 코드를 수정하지 않고 `ISimulationStrategy`를 구현한 클래스만 추가하면 됩니다.
 *   **DIP (Dependency Inversion Principle)**: UI는 구체적인 구현체가 아닌 추상화된 인터페이스(Service/Repository)에 의존하여 결합도를 낮췄습니다.
 
