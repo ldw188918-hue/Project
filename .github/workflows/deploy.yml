@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages (Stlite)
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -18,16 +18,20 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11" # Stlite needs 3.11+ often
+        python-version: "3.10"
 
     - name: Install Dependencies
       run: |
         pip install streamlit pandas numpy plotly
-        npm install -g @stlite/cli
-
-    - name: Build Stlite App
+        
+    - name: Create static page
       run: |
-        stlite build src/presentation/dashboard.py --output build
+        mkdir -p build
+        echo "# Digital Twin Dashboard" > build/index.html
+        echo "<h1>Digital Twin 공급망 리스크 분석 대시보드</h1>" >> build/index.html
+        echo "<p>이 프로젝트는 로컬 환경에서 실행 가능한 Streamlit 애플리케이션입니다.</p>" >> build/index.html
+        echo "<p>실행 방법: <code>streamlit run src/presentation/dashboard.py</code></p>" >> build/index.html
+        echo "<p>GitHub Repository: <a href='https://github.com/ldw188918-hue/Project'>https://github.com/ldw188918-hue/Project</a></p>" >> build/index.html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
