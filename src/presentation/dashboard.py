@@ -96,13 +96,12 @@ if st.session_state['theme'] == 'Dark Mode':
             fill: #FFFFFF !important;
         }
 
-        /* 메인 타이틀 그라데이션 */
-        .block-container h1 {
+        /* 메인 타이틀 그라데이션 (이모지 제외) */
+        .gradient-text {
             background: linear-gradient(90deg, #00E5FF, #FF2B7D);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
-            letter-spacing: -1px;
         }
         
         /* 카드 스타일 (Glassmorphism) */
@@ -203,7 +202,8 @@ else:
     """, unsafe_allow_html=True)
 
 # 헤더
-st.title("🏭 디지털 트윈: 공급망 리스크 분석")
+# st.title("🏭 디지털 트윈: 공급망 리스크 분석") -> 이모지 색상 보존을 위해 HTML 사용
+st.markdown("# 🏭 <span class='gradient-text'>디지털 트윈: 공급망 리스크 분석</span>", unsafe_allow_html=True)
 st.markdown("### 제조 분야 의사결정 지원 시스템 (DSS) - SOLID Architecture Ver.")
 
 # CSV 템플릿 로드 (템플릿 다운로드용)
