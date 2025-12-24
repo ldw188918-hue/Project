@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages (Stlite)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11" # Stlite needs 3.11+ often
+
+    - name: Install Stlite CLI
+      run: pip install stlite
+
+    - name: Build Stlite App
+      # src/presentation/dashboard.py를 진입점으로 마운트
+      # src 패키지 전체를 포함시켜야 임포트 오류가 안 남
+      run: |
+        stlite mount src/presentation/dashboard.py --root_dir . --out build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
