@@ -11,8 +11,22 @@ src_path = Path(__file__).parent.parent
 sys.path.insert(0, str(src_path))
 
 # 모듈 강제 리로드 (캐싱 문제 해결용)
-if 'infrastructure.repositories' in sys.modules:
-    importlib.reload(sys.modules['infrastructure.repositories'])
+modules_to_reload = [
+    'domain.models',
+    'domain.strategies',
+    'domain.insights_service',
+    'domain.forecast_service',
+    'infrastructure.repositories',
+    'application.services'
+]
+
+for module_name in modules_to_reload:
+    if module_name in sys.modules:
+        try:
+            importlib.reload(sys.modules[module_name])
+            print(f"Reloaded {module_name}")
+        except Exception as e:
+            print(f"Failed to reload {module_name}: {e}")
 
 from infrastructure.repositories import SimulationRepository
 from application.services import SimulationService
