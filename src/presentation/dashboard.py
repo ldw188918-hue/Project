@@ -61,15 +61,31 @@ with st.sidebar:
 
 # --- Dynamic CSS Injection ---
 if st.session_state['theme'] == 'Dark Mode':
-    # [Premium Dark / Neon Theme]
-    primary_color = "#00E5FF"
-    bg_color = "#0E1117"
-    text_color = "#FFFFFF"
-    card_bg = "rgba(255, 255, 255, 0.05)"
+    # [Premium Dark / Neon Theme Overlay]
     chart_template = "plotly_dark"
     
     st.markdown("""
     <style>
+        /* [Global Overrides for Dark Mode] */
+        /* 전체 배경 강제 적용 */
+        .stApp {
+            background-color: #0E1117;
+            color: #FFFFFF;
+        }
+        
+        /* 사이드바 배경 */
+        [data-testid="stSidebar"] {
+            background-color: #1A1D24;
+        }
+        
+        /* 텍스트 색상 강제 (기본 테마가 Light이므로 덮어씌워야 함) */
+        p, h1, h2, h3, h4, h5, h6, li, span, div {
+            color: #FFFFFF !important;
+        }
+        .stMarkdown {
+            color: #FFFFFF !important;
+        }
+
         /* 메인 타이틀 그라데이션 */
         .block-container h1 {
             background: linear-gradient(90deg, #00E5FF, #FF2B7D);
@@ -89,6 +105,14 @@ if st.session_state['theme'] == 'Dark Mode':
             transition: transform 0.2s ease, border-color 0.2s ease;
         }
         
+        /* 테마별 Metric Label 색상 교정 */
+        .stMetric label {
+            color: #E0E0E0 !important;
+        }
+        .stMetric div[data-testid="stMetricValue"] {
+            color: #FFFFFF !important;
+        }
+        
         .stMetric:hover {
             transform: translateY(-2px);
             border-color: #00E5FF;
@@ -101,11 +125,17 @@ if st.session_state['theme'] == 'Dark Mode':
             border-radius: 8px !important;
             border: 1px solid transparent;
             transition: all 0.2s;
+            color: #FFFFFF !important;
         }
         
         .streamlit-expanderHeader:hover {
             border-color: #FF2B7D;
             color: #FF2B7D !important;
+        }
+        
+        .streamlit-expanderContent {
+            background-color: #0E1117 !important;
+            color: #FFFFFF !important;
         }
         
         /* 탭 스타일 */
@@ -117,26 +147,29 @@ if st.session_state['theme'] == 'Dark Mode':
         .stTabs [aria-selected="true"] {
             background-color: #00E5FF !important; color: black !important; font-weight: bold;
         }
+        .stTabs [aria-selected="false"] {
+            color: white !important;
+        }
     </style>
     """, unsafe_allow_html=True)
 
 else:
-    # [Clean Light / Modern Theme]
-    primary_color = "#1f77b4" # Classic Blue
-    bg_color = "#ffffff"
-    text_color = "#262730"
-    card_bg = "#f0f2f6"
+    # [Original Light / Modern Theme]
+    # config.toml 설정(White BG, Blue Point)을 그대로 따름
+    # 추가적인 카드 스타일링만 가볍게 적용
     chart_template = "plotly_white"
     
     st.markdown("""
     <style>
-        /* 메인 타이틀 (깔끔한 블루) */
+        /* 메인 타이틀 (Classic Blue) */
         .block-container h1 {
-            color: #1f77b4;
+            color: #1f77b4 !important;
+            background: none;
+            -webkit-text-fill-color: initial;
             font-weight: 700;
         }
         
-        /* 카드 스타일 (Soft Shadow) */
+        /* 카드 스타일 (Clean White + Shadow) */
         .stMetric {
             background: #ffffff;
             border: 1px solid #e0e0e0;
@@ -152,26 +185,9 @@ else:
             border-color: #1f77b4;
         }
         
-        /* Expander 스타일 */
-        .streamlit-expanderHeader {
-            background-color: #f8f9fa !important;
-            border-radius: 8px !important;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .streamlit-expanderHeader:hover {
-            background-color: #e3f2fd !important;
-            border-color: #1f77b4;
-        }
-        
-        /* 탭 스타일 */
-        .stTabs [data-baseweb="tab-list"] { gap: 10px; }
-        .stTabs [data-baseweb="tab"] {
-            background-color: #f1f3f4;
-            border-radius: 4px; padding: 10px 20px; color: #555;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: #1f77b4 !important; color: white !important; font-weight: bold;
+        /* 텍스트 색상 복원 (필요시) */
+        p, h1, h2, h3, h4, h5, h6, li, span, div {
+            color: #262730;
         }
     </style>
     """, unsafe_allow_html=True)
