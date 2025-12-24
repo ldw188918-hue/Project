@@ -94,6 +94,62 @@ class SimulationRepository:
         
         return self._build_context(raw_data)
     
+    
+    def _standardize_columns(self, df: pd.DataFrame, target_type: str) -> pd.DataFrame:
+        """
+        데이터프레임의 컬럼명을 표준 스키마로 매핑한다.
+        (한글, 영어, 다양한 별칭 지원)
+        """
+        # 매핑 정의 (표준 컬럼명 -> [가능한 별칭들])
+        # 대소문자는 무시하고 비교함
+        mappings = {}
+        
+        if target_type == 'parts':
+            mappings = {
+                'Part_ID': ['id', 'part_id', 'item_id', 'code', '품목코드', '부품코드', '코드', '제품코드'],
+                'Part_Name': ['name', 'part_name', 'item_name', '품목명', '부품명', '이름', '품명'],
+                'Supplier_ID': ['supplier_id', 'vendor_id', 'partner_id', '공급사코드', '업체코드', '공급사'],
+                'Unit_Price': ['price', 'unit_price', 'cost', 'unit_cost', 'amount', '단가', '가격', '비용', '금액'],
+                'Current_Inventory': ['inventory', 'stock', 'qty', 'quantity', 'current_stock', '재고', '현재재고', '수량', '보유량'],
+                'Daily_Usage_Rate': ['usage', 'daily_usage', 'rate', 'demand', 'consumption', '일일사용량', '사용량', '소요량', '일일소요량']
+            }
+        elif target_type == 'suppliers':
+            mappings = {
+                'Supplier_ID': ['id', 'supplier_id', 'vendor_id', 'code', '공급사코드', '업체코드'],
+                'Supplier_Name': ['name', 'supplier_name', 'vendor_name', 'company', '공급사명', '업체명', '회사명'],
+                'Risk_Score': ['risk', 'risk_score', 'score', 'credit', '리스크', '위험도', '신용도', '점수'],
+                'Base_Lead_Time_Days': ['lead_time', 'leadtime', 'days', 'lt', 'time', '리드타임', '납기', '소요일']
+            }
+        elif target_type == 'production':
+            mappings = {
+                'Line_ID': ['id', 'line_id', 'line', 'code', '라인코드', '생산라인'],
+                'Line_Name': ['name', 'line_name', '라인명', '이름'],
+                'Capacity_Per_Day': ['capacity', 'capa', 'output', 'daily_capa', '생산능력', '일일생산량', 'capa'],
+                'Efficiency_Rate': ['efficiency', 'eff', 'rate', 'yield', '효율', '수율', '가동률']
+            }
+            
+        # 컬럼 변경
+        new_columns = {}
+        for col in df.columns:
+            col_lower = str(col).lower().replace(" ", "_").strip() # 소문자 및 공백 처리
+            
+            # 매핑 찾기
+            found = False
+            for std_col, aliases in mappings.items():
+                if col_lower == std_col.lower(): # 이미 표준 이름인 경우
+                    found = True
+                    break
+                if col_lower in aliases:
+                    new_columns[col] = std_col
+                    found = True
+                    break
+            
+        if new_columns:
+            print(f"DEBUG: Renaming columns for {target_type}: {new_columns}")
+            return df.rename(columns=new_columns)
+            
+        return df
+
     def _build_context(self, raw_data: dict) -> SimulationContext:
         """DataFrame을 도메인 모델로 변환"""
         
@@ -101,13 +157,16 @@ class SimulationRepository:
             # 1. Suppliers
             suppliers = []
             if 'suppliers' in raw_data and not raw_data['suppliers'].empty:
+                # 컬럼 표준화 적용
+                df = self._standardize_columns(raw_data['suppliers'], 'suppliers')
+                
                 # 필수 컬럼 검사
                 required_cols = ['Supplier_ID', 'Supplier_Name', 'Risk_Score', 'Base_Lead_Time_Days']
-                missing = [col for col in required_cols if col not in raw_data['suppliers'].columns]
+                missing = [col for col in required_cols if col not in df.columns]
                 if missing:
                     raise ValueError(f"공급사 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
 
-                for _, row in raw_data['suppliers'].iterrows():
+                for _, row in df.iterrows():
                     suppliers.append(Supplier(
                         id=row['Supplier_ID'],
                         name=row['Supplier_Name'],
@@ -118,12 +177,15 @@ class SimulationRepository:
             # 2. Parts
             parts = []
             if 'parts' in raw_data and not raw_data['parts'].empty:
+                # 컬럼 표준화 적용
+                df = self._standardize_columns(raw_data['parts'], 'parts')
+                
                 required_cols = ['Part_ID', 'Part_Name', 'Supplier_ID', 'Unit_Price', 'Current_Inventory', 'Daily_Usage_Rate']
-                missing = [col for col in required_cols if col not in raw_data['parts'].columns]
+                missing = [col for col in required_cols if col not in df.columns]
                 if missing:
                     raise ValueError(f"부품 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
 
-                for _, row in raw_data['parts'].iterrows():
+                for _, row in df.iterrows():
                     parts.append(Part(
                         id=row['Part_ID'],
                         name=row['Part_Name'],
@@ -136,19 +198,22 @@ class SimulationRepository:
             # 3. Production Lines
             lines = []
             if 'production' in raw_data and not raw_data['production'].empty:
+                # 컬럼 표준화 적용
+                df = self._standardize_columns(raw_data['production'], 'production')
+                
                 required_cols = ['Line_ID', 'Line_Name', 'Capacity_Per_Day', 'Efficiency_Rate']
-                missing = [col for col in required_cols if col not in raw_data['production'].columns]
+                missing = [col for col in required_cols if col not in df.columns]
                 if missing:
                     raise ValueError(f"생산라인 파일에 다음 필수 컬럼이 없습니다: {', '.join(missing)}")
 
-                for _, row in raw_data['production'].iterrows():
+                for _, row in df.iterrows():
                     lines.append(ProductionLine(
                         id=row['Line_ID'],
                         name=row['Line_Name'],
                         capacity_per_day=int(row['Capacity_Per_Day']),
                         efficiency_rate=float(row['Efficiency_Rate'])
                     ))
-                
+            
             return SimulationContext(
                 parts=parts,
                 suppliers=suppliers,
@@ -156,7 +221,7 @@ class SimulationRepository:
             )
             
         except KeyError as e:
-            raise ValueError(f"데이터 컬럼 오류: {str(e)} 컬럼을 찾을 수 없습니다. 템플릿을 확인해주세요.")
+            raise ValueError(f"데이터 컬럼 오류: {str(e)} 컬럼을 찾을 수 없습니다. 컬럼명이 '단가', '재고', '리드타임' 등으로 되어있더라도 자동으로 인식됩니다.")
         except ValueError as e:
             raise e
         except Exception as e:
