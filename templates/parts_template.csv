@@ -1,0 +1,6 @@
+Part_ID,Part_Name,Supplier_ID,Unit_Price,Current_Inventory,Daily_Usage_Rate
+P1,Part Alpha,S1,100.0,500,50
+P2,Part Beta,S1,150.0,300,30
+P3,Part Gamma,S2,200.0,200,20
+P4,Part Delta,S2,80.0,600,40
+P5,Part Epsilon,S3,120.0,400,25

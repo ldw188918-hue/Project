@@ -41,10 +41,45 @@ class SimulationRepository:
     """
     SimulationRepository
     - 데이터 소스(CSV, DB, API, Mock)로부터 도메인 모델을 로드한다.
-    - 현재는 내부 mock 데이터를 사용합니다.
+    - 현재는 내부 mock 데이터를 사용하거나 CSV 파일 업로드를 지원합니다.
     """
+    
     def load_context(self) -> SimulationContext:
+        """기본 mock 데이터로 컨텍스트 로드"""
         raw_data = _generate_mock_data()
+        return self._build_context(raw_data)
+    
+    def load_context_from_uploads(
+        self, 
+        parts_csv=None, 
+        suppliers_csv=None, 
+        production_csv=None
+    ) -> SimulationContext:
+        """업로드된 CSV 파일로부터 컨텍스트 로드
+        
+        Args:
+            parts_csv: 부품 데이터 CSV 파일 (UploadedFile 객체)
+            suppliers_csv: 공급사 데이터 CSV 파일
+            production_csv: 생산라인 데이터 CSV 파일
+            
+        Returns:
+            SimulationContext: 업로드된 데이터 또는 mock 데이터로 생성된 컨텍스트
+        """
+        # 기본 mock 데이터 먼저 로드
+        raw_data = _generate_mock_data()
+        
+        # 업로드된 파일이 있으면 덮어쓰기
+        if parts_csv is not None:
+            raw_data['parts'] = pd.read_csv(parts_csv)
+        if suppliers_csv is not None:
+            raw_data['suppliers'] = pd.read_csv(suppliers_csv)
+        if production_csv is not None:
+            raw_data['production'] = pd.read_csv(production_csv)
+        
+        return self._build_context(raw_data)
+    
+    def _build_context(self, raw_data: dict) -> SimulationContext:
+        """DataFrame을 도메인 모델로 변환"""
         
         # 1. Suppliers
         suppliers = []

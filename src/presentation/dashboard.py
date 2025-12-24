@@ -23,20 +23,99 @@ st.set_page_config(
 st.title("🏭 디지털 트윈: 공급망 리스크 분석")
 st.markdown("### 제조 분야 의사결정 지원 시스템 (DSS) - SOLID Architecture Ver.")
 
+# CSV 템플릿 로드 (템플릿 다운로드용)
+@st.cache_data
+def load_templates():
+    templates_path = Path(__file__).parent.parent.parent / "templates"
+    return {
+        'parts': (templates_path / "parts_template.csv").read_text(),
+        'suppliers': (templates_path / "suppliers_template.csv").read_text(),
+        'production': (templates_path / "production_template.csv").read_text()
+    }
+
+templates = load_templates()
+
+# 사이드바 - CSV 업로드
+with st.sidebar.expander("📁 데이터 업로드 (선택사항)", expanded=False):
+    st.markdown("**자체 데이터로 시뮬레이션하기**")
+    st.markdown("CSV 템플릿을 다운로드하여 수정 후 업로드하세요.")
+    
+    # 템플릿 다운로드 버튼
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.download_button(
+            label="📥 부품",
+            data=templates['parts'],
+            file_name="parts_template.csv",
+            mime="text/csv",
+            help="부품 데이터 템플릿"
+        )
+    with col2:
+        st.download_button(
+            label="📥 공급사",
+            data=templates['suppliers'],
+            file_name="suppliers_template.csv",
+            mime="text/csv",
+            help="공급사 데이터 템플릿"
+        )
+    with col3:
+        st.download_button(
+            label="📥 생산라인",
+            data=templates['production'],
+            file_name="production_template.csv",
+            mime="text/csv",
+            help="생산라인 데이터 템플릿"
+        )
+    
+    st.markdown("---")
+    
+    # CSV 업로드 위젯
+    parts_file = st.file_uploader(
+        "부품 데이터 (CSV)", 
+        type=['csv'],
+        key='parts_upload',
+        help="열: Part_ID, Part_Name, Supplier_ID, Unit_Price, Current_Inventory, Daily_Usage_Rate"
+    )
+    
+    suppliers_file = st.file_uploader(
+        "공급사 데이터 (CSV)",
+        type=['csv'],
+        key='suppliers_upload',
+        help="열: Supplier_ID, Supplier_Name, Risk_Score, Base_Lead_Time_Days"
+    )
+    
+    production_file = st.file_uploader(
+        "생산라인 데이터 (CSV)",
+        type=['csv'],
+        key='production_upload',
+        help="열: Line_ID, Line_Name, Capacity_Per_Day, Efficiency_Rate"
+    )
+
 # 데이터 로드 (DI: Dependency Injection 유사 패턴)
 @st.cache_data
-def get_simulation_service():
+def get_simulation_service(_parts_file=None, _suppliers_file=None, _production_file=None):
     repo = SimulationRepository()
-    context = repo.load_context()
+    
+    # 업로드된 파일이 있으면 사용, 없으면 mock 데이터
+    if _parts_file or _suppliers_file or _production_file:
+        context = repo.load_context_from_uploads(
+            parts_csv=_parts_file,
+            suppliers_csv=_suppliers_file,
+            production_csv=_production_file
+        )
+    else:
+        context = repo.load_context()
+    
     return SimulationService(context)
 
-service = get_simulation_service()
+service = get_simulation_service(parts_file, suppliers_file, production_file)
 
 # 기존 레거시 데이터프레임 접근 (차트 그리기용, 서비스에서 데이터를 DTO로 꺼내오는 게 정석이나 편의상 컨텍스트 활용)
 # 하지만 순수하게 하기 위해 서비스나 리포지토리에서 DF 변환 메서드를 제공하는 것이 좋음.
 # 여기서는 시각화를 위해 Context 데이터를 DataFrame으로 변환.
 context = service.context
 df_parts = pd.DataFrame([vars(p) for p in context.parts])
+
 
 # 사이드바
 st.sidebar.header("🎛️ What-If 시나리오 시뮬레이션")

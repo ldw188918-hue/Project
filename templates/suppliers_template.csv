@@ -1,0 +1,4 @@
+Supplier_ID,Supplier_Name,Risk_Score,Base_Lead_Time_Days
+S1,Supplier A,0.3,7
+S2,Supplier B,0.5,10
+S3,Supplier C,0.2,5

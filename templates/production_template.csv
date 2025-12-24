@@ -1,0 +1,4 @@
+Line_ID,Line_Name,Capacity_Per_Day,Efficiency_Rate
+L1,Line 1,100,0.95
+L2,Line 2,150,0.90
+L3,Line 3,120,0.92
